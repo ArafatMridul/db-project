@@ -121,7 +121,11 @@ const Navbar = ({ transparent }) => {
                                     <div className="flex justify-center flex-col gap-6 mt-18 font-bold text-3xl">
                                         <div>
                                             <Link
-                                                to="/menu"
+                                                to={
+                                                    currentUser
+                                                        ? "/menu"
+                                                        : "/login"
+                                                }
                                                 className="relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:bg-black after:h-1 after:transition-all after:duration-500 after:ease-in-out hover:after:w-full after:rounded-lg"
                                             >
                                                 Explore Our Menu

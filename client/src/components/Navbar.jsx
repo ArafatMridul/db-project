@@ -133,7 +133,15 @@ const Navbar = ({ transparent }) => {
                                         </div>
                                         <div>
                                             <Link
-                                                to="/order"
+                                                to="/cart"
+                                                className="relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:bg-black after:h-1 after:transition-all after:duration-500 after:ease-in-out hover:after:w-full after:rounded-lg"
+                                            >
+                                                Go To Cart
+                                            </Link>
+                                        </div>
+                                        <div>
+                                            <Link
+                                                to="/orders"
                                                 className="relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:bg-black after:h-1 after:transition-all after:duration-500 after:ease-in-out hover:after:w-full after:rounded-lg"
                                             >
                                                 Check Order History

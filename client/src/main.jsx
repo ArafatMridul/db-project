@@ -4,12 +4,15 @@ import "./index.css";
 import App from "./App.jsx";
 import { UserProvider } from "./context/userContex.jsx";
 import { CartProvider } from "./context/cartContex.jsx";
+import { OrderProvider } from "./context/orderContext.jsx";
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
         <UserProvider>
             <CartProvider>
-                <App />
+                <OrderProvider>
+                    <App />
+                </OrderProvider>
             </CartProvider>
         </UserProvider>
     </StrictMode>

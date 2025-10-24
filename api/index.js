@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/cart.js";
 import cartRoutes from "./routes/cart.js";
 import orderRoutes from "./routes/order.js";
+import adminRoutes from "./routes/admin.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -24,6 +25,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.listen(8800, () => {
     console.log("Connected");

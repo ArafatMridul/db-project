@@ -206,6 +206,74 @@ export const addNewPizza = async (req, res) => {
     }
 };
 
+export const editPizza = async (req, res) => {
+    try {
+        const {
+            pizza_id,
+            name,
+            unit_price,
+            img_url,
+            soldOut_status,
+            ingredients,
+        } = req.body;
+
+        if (!pizza_id)
+            return res.status(400).json({ error: "pizza_id is required" });
+
+        // Update pizza basic details
+        const q1 = `UPDATE pizza_menu SET name = ?, unit_price = ?, img_url = ?, soldOut_status = ? WHERE pizza_id = ?`;
+
+        db.query(
+            q1,
+            [name, unit_price, img_url, soldOut_status ?? false, pizza_id],
+            async (err) => {
+                if (err) {
+                    console.error("Error updating pizza:", err);
+                    return res.status(500).json({ error: err.message });
+                }
+
+                // If ingredients provided, refresh the relationship
+                if (ingredients && ingredients.length > 0) {
+                    // Delete existing relationships
+                    const deleteQ =
+                        "DELETE FROM pizza_ingredients WHERE pizza_id = ?";
+                    db.query(deleteQ, [pizza_id], (delErr) => {
+                        if (delErr) {
+                            console.error(
+                                "Error deleting old ingredients:",
+                                delErr
+                            );
+                            return res
+                                .status(500)
+                                .json({ error: delErr.message });
+                        }
+
+                        // Insert new relationships
+                        const insertQ = `INSERT INTO pizza_ingredients (pizza_id, ingredient_id) VALUES (?, (SELECT ingredient_id FROM ingredients WHERE name = ? LIMIT 1))`;
+
+                        ingredients.forEach((ing) => {
+                            db.query(insertQ, [pizza_id, ing], (insErr) => {
+                                if (insErr)
+                                    console.error(
+                                        "Ingredient insert error:",
+                                        insErr.message
+                                    );
+                            });
+                        });
+                    });
+                }
+
+                return res
+                    .status(200)
+                    .json({ message: "Pizza updated successfully!" });
+            }
+        );
+    } catch (err) {
+        console.error("Edit Pizza Error:", err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
 export const getAllIngredients = (req, res) => {
     try {
         const q =
@@ -242,19 +310,20 @@ export const getAllIngredients = (req, res) => {
 };
 
 export const markPizzaAsSoldOut = (req, res) => {
-    const { pizza_id } = req.body;
+    const { pizza_id, soldOut_status } = req.body;
 
-    if (!pizza_id) {
-        return res.status(400).json({ error: "Pizza ID is required." });
+    if (!pizza_id || soldOut_status === undefined) {
+        return res
+            .status(400)
+            .json({ error: "Pizza ID and soldOut_status are required." });
     }
 
     try {
-        const q =
-            "UPDATE pizza_menu SET soldOut_status = TRUE WHERE pizza_id = ?";
+        const q = "UPDATE pizza_menu SET soldOut_status = ? WHERE pizza_id = ?";
 
-        db.query(q, [pizza_id], (err, result) => {
+        db.query(q, [soldOut_status, pizza_id], (err, result) => {
             if (err) {
-                console.log(
+                console.error(
                     "Database error while updating sold-out status:",
                     err
                 );
@@ -266,11 +335,13 @@ export const markPizzaAsSoldOut = (req, res) => {
             }
 
             res.status(200).json({
-                message: "Pizza marked as sold out successfully!",
+                message: `Pizza marked as ${
+                    soldOut_status ? "SOLD OUT" : "AVAILABLE"
+                } successfully!`,
             });
         });
     } catch (err) {
-        console.log("Catch error:", err);
+        console.error("Catch error:", err);
         res.status(500).json({ error: err.message });
     }
 };
@@ -376,5 +447,29 @@ export const updateOrderStatus = (req, res) => {
     } catch (err) {
         console.log("Catch error:", err);
         res.status(500).json({ error: err.message });
+    }
+};
+
+export const getTotalOrders = (req, res) => {
+    try {
+        const q = "SELECT COUNT(*) AS totalOrders FROM orders";
+
+        db.query(q, (err, result) => {
+            if (err) {
+                console.error("Database error while counting orders:", err);
+                return res
+                    .status(500)
+                    .json({ error: "Failed to count orders." });
+            }
+
+            // result[0].totalOrders will hold the total count
+            res.status(200).json({
+                total: result[0].totalOrders,
+                message: "Total orders retrieved successfully.",
+            });
+        });
+    } catch (err) {
+        console.error("Unexpected server error:", err);
+        res.status(500).json({ error: "Server error occurred." });
     }
 };

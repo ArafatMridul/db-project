@@ -135,22 +135,16 @@ export const getCart = async (req, res) => {
 
         const q = `
             SELECT 
-                ci.cart_item_id,
-                ci.pizza_id,
-                ci.quantity,
-                p.name,
-                p.unit_price,
-                p.img_url,
-                (ci.quantity * p.unit_price) as total_price,
-                GROUP_CONCAT(i.name SEPARATOR ', ') as ingredients
-            FROM cart c
-            JOIN cart_items ci ON c.cart_id = ci.cart_id
-            JOIN pizza_menu p ON ci.pizza_id = p.pizza_id
-            LEFT JOIN pizza_ingredients pi ON p.pizza_id = pi.pizza_id
-            LEFT JOIN ingredients i ON pi.ingredient_id = i.ingredient_id
-            WHERE c.user_id = ?
-            GROUP BY ci.cart_item_id, ci.pizza_id, ci.quantity, p.name, p.unit_price, p.img_url
-            ORDER BY ci.added_at DESC
+                cart_item_id,
+                pizza_id,
+                quantity,
+                pizza_name AS name,
+                unit_price,
+                img_url,
+                total_price
+            FROM cart_details
+            WHERE user_id = ?
+            ORDER BY cart_item_id DESC;
         `;
 
         db.query(q, [userId], (err, data) => {

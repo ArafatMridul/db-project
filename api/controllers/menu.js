@@ -3,20 +3,7 @@ import { db } from "../DB.js";
 export const getMenu = async (req, res) => {
     try {
         const q = `
-            SELECT
-                p.*,
-                ingredients
-            FROM pizza_menu p
-            JOIN (
-                SELECT 
-                    pizza_id,
-                    GROUP_CONCAT(NAME SEPARATOR ', ') AS ingredients
-                FROM pizza_ingredients p
-                JOIN ingredients i
-                ON p.ingredient_id = i.ingredient_id
-                GROUP BY pizza_id
-            ) i
-            on p.pizza_id = i.pizza_id
+            SELECT * FROM pizza_with_ingredients;
         `;
 
         db.query(q, (err, data) => {

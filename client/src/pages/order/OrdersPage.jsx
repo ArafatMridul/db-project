@@ -4,6 +4,18 @@ import OrderStats from "../../pages/order/OrderStats";
 import { useUser } from "../../context/userContex";
 import { useOrder } from "../../context/orderContext";
 import Navbar from "../../components/Navbar";
+import { orders } from "../../utils/SQLQuerries";
+import ExplainCode from "../../components/ExplainCode";
+
+const orderQuery = {
+    "Get User Orders": orders.getUserOrders,
+    "Get Order Items by ID": orders.getOrderItemsByOrderId,
+    "Get Order by ID": orders.getOrderById,
+    "Check Order Belongs to User": orders.checkOrderBelongsToUser,
+    "Update Order Status": orders.updateOrderStatus,
+    "Check Order Status": orders.checkOrderStatus,
+    "Cancel Order": orders.cancelOrder,
+};
 
 const OrdersPage = () => {
     const { orders, orderStats, isLoading, fetchUserOrders } = useOrder();
@@ -93,6 +105,7 @@ const OrdersPage = () => {
                     </div>
                 </div>
             </div>
+            <ExplainCode queries={orderQuery} />
         </>
     );
 };

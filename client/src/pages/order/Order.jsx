@@ -3,6 +3,17 @@ import OrderForm from "./OrderForm";
 import CartSummary from "./CartSummary";
 import SuccessMessage from "./SuccessMessage";
 import Navbar from "../../components/Navbar";
+import { orders } from "../../utils/SQLQuerries";
+import ExplainCode from "../../components/ExplainCode";
+
+export const orderQueries = {
+    "Get User Info": orders.getUserInfoQuery,
+    "Get Cart Items for Order": orders.getCartItemsForOrderQuery,
+    "Create Order": orders.createOrderQuery,
+    "Insert Order Item": orders.insertOrderItemQuery,
+    "Insert Order Info": orders.insertOrderInfoQuery,
+    "Clear Cart After Order": orders.clearCartAfterOrderQuery,
+};
 
 const Order = () => {
     const [showSuccess, setShowSuccess] = useState(false);
@@ -40,6 +51,7 @@ const Order = () => {
                     onClose={handleCloseSuccess}
                 />
             </div>
+            <ExplainCode queries={orderQueries} />
         </>
     );
 };

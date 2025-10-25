@@ -2,6 +2,17 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import AdminNavbar from "./AdminNavbar";
 import AdminSidebar from "./AdminSidebar";
+import ExplainCode from "../../components/ExplainCode";
+import { adminQuery } from "../../utils/SQLQuerries";
+
+const adminQueries = {
+    "Get All Users": adminQuery.getAllUsersQuery,
+    "Get All Pizzas": adminQuery.getAllPizzasQuery,
+    "Add New Pizza": adminQuery.addNewPizzaQuery,
+    "Mark Pizza as Sold Out": adminQuery.markPizzaAsSoldOutQuery,
+    "Get User Orders": adminQuery.getUserOrdersQuery,
+    "Update Order Status": adminQuery.updateOrderStatusQuery,
+};
 
 export default function AdminLayout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -24,6 +35,8 @@ export default function AdminLayout({ children }) {
                     {children}
                 </motion.main>
             </div>
+
+            <ExplainCode queries={adminQueries} />
         </div>
     );
 }

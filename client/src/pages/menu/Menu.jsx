@@ -4,6 +4,12 @@ import Navbar from "../../components/Navbar";
 import MenuItem from "./MenuItem";
 import CartOverview from "../cart/CartOverview";
 import { useCart } from "../../context/cartContex";
+import ExplainCode from "../../components/ExplainCode";
+import { fetchMenuQuerry } from "../../utils/SQLQuerries";
+
+const queries = {
+    "Fetch Menu Query": fetchMenuQuerry,
+};
 
 const Menu = () => {
     const [menu, setMenu] = useState([]);
@@ -34,6 +40,7 @@ const Menu = () => {
                     )}
                 </div>
             </div>
+            <ExplainCode queries={queries} />
         </>
     );
 };

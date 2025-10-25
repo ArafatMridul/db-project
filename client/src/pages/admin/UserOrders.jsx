@@ -57,14 +57,14 @@ export default function UserOrders() {
                 <h2 className="text-xl font-semibold mb-3 text-white">
                     👥 All Users
                 </h2>
-                <ul className="divide-y divide-gray-200">
+                <ul className="divide-y divide-gray-200 grid gap-3">
                     {usersData?.map((user) => (
                         <motion.li
                             key={user.id}
-                            className={`p-3 cursor-pointer rounded transition ${
+                            className={`p-3 border-none cursor-pointer rounded transition ${
                                 selectedUser === user.id
-                                    ? "border border-white font-medium bg-[#404040]"
-                                    : "border-none hover:bg-slate-600"
+                                    ? "ring-2 ring-gray-200 font-medium bg-[#404040]"
+                                    : "hover:ring-1 hover:ring-gray-200 hover:bg-[#404040]"
                             }`}
                             onClick={() => fetchUserOrders(user.id)}
                         >

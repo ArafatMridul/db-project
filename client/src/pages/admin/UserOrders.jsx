@@ -10,7 +10,9 @@ export default function UserOrders() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [orders, setOrders] = useState([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
+    const [showToday, setShowToday] = useState(false);
 
+    // 🔹 Fetch orders for one user
     const fetchUserOrders = async (userId) => {
         setLoadingOrders(true);
         try {
@@ -20,6 +22,7 @@ export default function UserOrders() {
             const data = await res.json();
             setOrders(data.orders || []);
             setSelectedUser(userId);
+            setShowToday(false);
         } catch (err) {
             console.error("Error fetching user orders:", err);
         } finally {
@@ -27,6 +30,50 @@ export default function UserOrders() {
         }
     };
 
+    // 🔹 Combine orders of all users and filter for today
+    const fetchTodaysOrders = async () => {
+        if (!usersData || usersData.length === 0) return;
+        setLoadingOrders(true);
+        try {
+            const allOrders = [];
+
+            for (const user of usersData) {
+                const res = await fetch(`${API_BASE}/orders/${user.id}`, {
+                    credentials: "include",
+                });
+                const data = await res.json();
+                if (data.orders?.length) {
+                    // attach user info for display
+                    const userOrders = data.orders.map((o) => ({
+                        ...o,
+                        user: { username: user.username, email: user.email },
+                    }));
+                    allOrders.push(...userOrders);
+                }
+            }
+
+            // Filter only today's
+            const today = new Date();
+            const todaysOrders = allOrders.filter((order) => {
+                const date = new Date(order.order_date);
+                return (
+                    date.getFullYear() === today.getFullYear() &&
+                    date.getMonth() === today.getMonth() &&
+                    date.getDate() === today.getDate()
+                );
+            });
+
+            setOrders(todaysOrders);
+            setShowToday(true);
+            setSelectedUser(null);
+        } catch (err) {
+            console.error("Error fetching today's orders:", err);
+        } finally {
+            setLoadingOrders(false);
+        }
+    };
+
+    // 🔹 Update status
     const updateOrderStatus = async (orderId, currentStatus, newStatus) => {
         if (currentStatus === newStatus) return;
         try {
@@ -37,7 +84,10 @@ export default function UserOrders() {
             });
             const data = await res.json();
             alert(data.message || "Order status updated!");
-            fetchUserOrders(selectedUser); // refresh after update
+
+            // refresh correct data
+            if (showToday) fetchTodaysOrders();
+            else if (selectedUser) fetchUserOrders(selectedUser);
         } catch (err) {
             console.error("Error updating status:", err);
             alert("Failed to update order status.");
@@ -54,9 +104,12 @@ export default function UserOrders() {
         >
             {/* LEFT: User List */}
             <div className="border-2 border-gray-200 shadow-md rounded-xl p-4 sticky top-6 h-fit">
-                <h2 className="text-xl font-semibold mb-3 text-white">
-                    👥 All Users
-                </h2>
+                <div className="flex justify-between items-center mb-3">
+                    <h2 className="text-xl font-semibold text-white">
+                        👥 All Users
+                    </h2>
+                </div>
+
                 <ul className="divide-y divide-gray-200 grid gap-3">
                     {usersData?.map((user) => (
                         <motion.li
@@ -73,19 +126,28 @@ export default function UserOrders() {
                         </motion.li>
                     ))}
                 </ul>
+                <button
+                    onClick={fetchTodaysOrders}
+                    className="bg-[#404040] outline-2 cursor-pointer outline-gray-200 text-white text-sm px-3 py-2 rounded-lg shadow mt-4"
+                >
+                    Show Today’s Orders
+                </button>
             </div>
 
             {/* RIGHT: Orders */}
             <div className="border border-gray-200 shadow-md rounded-xl p-4">
-                {!selectedUser ? (
-                    <p className="text-white text-center mt-20">
-                        👈 Select a user to view their orders
+                {loadingOrders ? (
+                    <p className="text-center text-white mt-20">
+                        Loading orders...
                     </p>
                 ) : orders.length > 0 ? (
                     <div>
                         <h2 className="text-2xl mb-4 font-semibold text-white">
-                            Orders for User ID: {selectedUser}
+                            {showToday
+                                ? "📅 All Orders Placed Today"
+                                : `Orders for User ID: ${selectedUser}`}
                         </h2>
+
                         {orders.map((order) => {
                             let nextStatuses = [];
                             if (order.status === "pending")
@@ -127,6 +189,15 @@ export default function UserOrders() {
                                             </p>
                                         </div>
 
+                                        {/* User info only for all-today view */}
+                                        {showToday && order.user && (
+                                            <p className="text-white mb-2">
+                                                <b>User:</b>{" "}
+                                                {order.user.username} (
+                                                {order.user.email})
+                                            </p>
+                                        )}
+
                                         <p className="text-white">
                                             <b>Total:</b> ${order.total_amount}
                                         </p>
@@ -156,7 +227,6 @@ export default function UserOrders() {
                                                         value=""
                                                         disabled
                                                         hidden
-                                                        className="text-black"
                                                     >
                                                         Change status
                                                     </option>
@@ -165,7 +235,6 @@ export default function UserOrders() {
                                                             <option
                                                                 key={status}
                                                                 value={status}
-                                                                className="text-black"
                                                             >
                                                                 {status}
                                                             </option>
@@ -179,13 +248,13 @@ export default function UserOrders() {
                             );
                         })}
                     </div>
-                ) : loadingOrders ? (
-                    <p className="text-center text-white mt-20">
-                        Loading orders...
-                    </p>
                 ) : (
                     <p className="text-white text-center mt-20">
-                        This user has no orders yet.
+                        {showToday
+                            ? "No orders placed today."
+                            : selectedUser
+                            ? "This user has no orders yet."
+                            : "👈 Select a user or show today's orders"}
                     </p>
                 )}
             </div>

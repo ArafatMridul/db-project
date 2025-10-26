@@ -12,7 +12,7 @@ function MenuItem({ pizza }) {
             <img
                 src={img_url}
                 alt={name}
-                className={`h-24 ${
+                className={`h-24 w-24 object-cover ${
                     soldOut_status ? "opacity-70 grayscale" : ""
                 }`}
             />

@@ -19,92 +19,92 @@ export const fetchMenuQuerry = `
 // Cart query
 export const cartQuery = {
     getCartIdQuery: `
-    SELECT cart_id FROM cart WHERE user_id = ?;
-    -- params: [user_id]
-  `,
+        SELECT cart_id FROM cart WHERE user_id = ?;
+        -- params: [user_id]
+    `,
 
     createCartQuery: `
-    INSERT INTO cart (user_id) VALUES (?);
-    -- params: [user_id]
-  `,
+        INSERT INTO cart (user_id) VALUES (?);
+        -- params: [user_id]
+    `,
 
     checkPizzaExistsQuery: `
-    SELECT pizza_id FROM pizza_menu WHERE pizza_id = ?;
-    -- params: [pizza_id]
-  `,
+        SELECT pizza_id FROM pizza_menu WHERE pizza_id = ?;
+        -- params: [pizza_id]
+    `,
 
     checkCartItemQuery: `
-    SELECT * FROM cart_items WHERE cart_id = ? AND pizza_id = ?;
-    -- params: [cart_id, pizza_id]
-  `,
+        SELECT * FROM cart_items WHERE cart_id = ? AND pizza_id = ?;
+        -- params: [cart_id, pizza_id]
+    `,
 
     updateCartItemQuantityQuery: `
-    UPDATE cart_items 
-    SET quantity = quantity + ? 
-    WHERE cart_id = ? AND pizza_id = ?;
-    -- params: [quantity, cart_id, pizza_id]
-  `,
+        UPDATE cart_items 
+        SET quantity = quantity + ? 
+        WHERE cart_id = ? AND pizza_id = ?;
+        -- params: [quantity, cart_id, pizza_id]
+    `,
 
     addCartItemQuery: `
-    INSERT INTO cart_items (cart_id, pizza_id, quantity) 
-    VALUES (?, ?, ?);
-    -- params: [cart_id, pizza_id, quantity]
-  `,
+        INSERT INTO cart_items (cart_id, pizza_id, quantity) 
+        VALUES (?, ?, ?);
+        -- params: [cart_id, pizza_id, quantity]
+    `,
 
     getCartItemsQuery: `
-    SELECT 
-        ci.cart_item_id,
-        ci.pizza_id,
-        ci.quantity,
-        p.name,
-        p.unit_price,
-        p.img_url,
-        (ci.quantity * p.unit_price) AS total_price,
-        GROUP_CONCAT(i.name SEPARATOR ', ') AS ingredients
-    FROM cart c
-    JOIN cart_items ci ON c.cart_id = ci.cart_id
-    JOIN pizza_menu p ON ci.pizza_id = p.pizza_id
-    LEFT JOIN pizza_ingredients pi ON p.pizza_id = pi.pizza_id
-    LEFT JOIN ingredients i ON pi.ingredient_id = i.ingredient_id
-    WHERE c.user_id = ?
-    GROUP BY ci.cart_item_id, ci.pizza_id, ci.quantity, p.name, p.unit_price, p.img_url
-    ORDER BY ci.added_at DESC;
-    -- params: [user_id]
-  `,
+        SELECT 
+            ci.cart_item_id,
+            ci.pizza_id,
+            ci.quantity,
+            p.name,
+            p.unit_price,
+            p.img_url,
+            (ci.quantity * p.unit_price) AS total_price,
+            GROUP_CONCAT(i.name SEPARATOR ', ') AS ingredients
+        FROM cart c
+        JOIN cart_items ci ON c.cart_id = ci.cart_id
+        JOIN pizza_menu p ON ci.pizza_id = p.pizza_id
+        LEFT JOIN pizza_ingredients pi ON p.pizza_id = pi.pizza_id
+        LEFT JOIN ingredients i ON pi.ingredient_id = i.ingredient_id
+        WHERE c.user_id = ?
+        GROUP BY ci.cart_item_id, ci.pizza_id, ci.quantity, p.name, p.unit_price, p.img_url
+        ORDER BY ci.added_at DESC;
+        -- params: [user_id]
+    `,
 
     verifyCartItemOwnershipQuery: `
-    SELECT ci.cart_item_id 
-    FROM cart_items ci
-    JOIN cart c ON ci.cart_id = c.cart_id
-    WHERE ci.cart_item_id = ? AND c.user_id = ?;
-    -- params: [cart_item_id, user_id]
-  `,
+        SELECT ci.cart_item_id 
+        FROM cart_items ci
+        JOIN cart c ON ci.cart_id = c.cart_id
+        WHERE ci.cart_item_id = ? AND c.user_id = ?;
+        -- params: [cart_item_id, user_id]
+    `,
 
     updateCartItemQuery: `
-    UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?;
-    -- params: [quantity, cart_item_id]
-  `,
+        UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?;
+        -- params: [quantity, cart_item_id]
+    `,
 
     deleteCartItemQuery: `
-    DELETE FROM cart_items WHERE cart_item_id = ?;
-    -- params: [cart_item_id]
-  `,
+        DELETE FROM cart_items WHERE cart_item_id = ?;
+        -- params: [cart_item_id]
+    `,
 
     clearCartQuery: `
-    DELETE ci 
-    FROM cart_items ci
-    JOIN cart c ON ci.cart_id = c.cart_id
-    WHERE c.user_id = ?;
-    -- params: [user_id]
-  `,
+        DELETE ci 
+        FROM cart_items ci
+        JOIN cart c ON ci.cart_id = c.cart_id
+        WHERE c.user_id = ?;
+        -- params: [user_id]
+    `,
 
     getCartCountQuery: `
-    SELECT COALESCE(SUM(ci.quantity), 0) AS count
-    FROM cart c
-    LEFT JOIN cart_items ci ON c.cart_id = ci.cart_id
-    WHERE c.user_id = ?;
-    -- params: [user_id]
-  `,
+        SELECT COALESCE(SUM(ci.quantity), 0) AS count
+        FROM cart c
+        LEFT JOIN cart_items ci ON c.cart_id = ci.cart_id
+        WHERE c.user_id = ?;
+        -- params: [user_id]
+    `,
 };
 
 // Order query
